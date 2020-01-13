@@ -15,7 +15,7 @@ def merge_files():
     Função para importar somente os comentários positivos
     :return: lista contendo todos textos positivos
     """
-    path = Path("../../files")
+    path = Path("../files")
     text_train_pos = []
     text_train_neg = []
     text_test_pos = []
