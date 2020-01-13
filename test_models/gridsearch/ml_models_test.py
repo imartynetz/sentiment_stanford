@@ -3,7 +3,7 @@ import numpy as np
 import common_modules
 import pdpipe as pdp
 from logistic_regression import reg_log
-from svm import svm
+from svm import sup_vec
 from naive_bayes import naive_bayes
 
 
@@ -15,25 +15,16 @@ def main():
     train = pipeline(train)
     #test = pipeline(test)
 
-    scores = pd.DataFrame()
+
     print("Fazendo gridSearch da Regressão logistica")
     score_log_reg, param_log_reg = reg_log(train.texto, train.label)
-    scores.loc[0, 'model'] = "Regressão Logistica"
-    scores.loc[0, 'score'] = score_log_reg
-    scores.loc[0, 'parâmetro'] = param_log_reg
-
+    print(f"Regressão linear best score {score_log_reg}, com parâmetros {param_log_reg} ")
     print("Fazendo gridSearch da SVM")
-    score_svm, param_svm = svm(train.texto, train.label)
-    scores.loc[0, 'model'] = "SVM"
-    scores.loc[0, 'score'] = score_svm
-    scores.loc[0, 'parâmetro'] = param_svm
-
+    score_svm, param_svm = sup_vec(train.texto, train.label)
+    print(f"suport vector best score {score_svm}, com parâmetros {param_svm} ")
     print("Fazendo gridSearch da Naive bayes")
     score_nb, param_nb = naive_bayes(train.texto, train.label)
-    scores.loc[0, 'model'] = "Naive Bayes"
-    scores.loc[0, 'score'] = score_nb
-    scores.loc[0, 'parâmetro'] = param_nb
-    scores.to_csv('ml_parameter.csv')
+    print(f"Multinomial Naive bayes best score {score_nb}, com parâmetros {param_nb} ")
 
 
 if __name__ == "__main__":

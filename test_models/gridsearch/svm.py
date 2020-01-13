@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 
 
-def svm(X_train, y_train):
+def sup_vec(X_train, y_train):
     pipe = Pipeline([('tfidf', TfidfVectorizer()),
                      ('svm', svm(random_state=42))
                      ])

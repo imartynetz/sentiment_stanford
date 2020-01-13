@@ -15,22 +15,22 @@ def merge_files():
     Função para importar somente os comentários positivos
     :return: lista contendo todos textos positivos
     """
-    path = Path("../files")
+    path = Path("../../files")
     text_train_pos = []
     text_train_neg = []
     text_test_pos = []
     text_test_neg = []
     for e in path.rglob('*/*/*.txt'):
         content = e.read_text()
-        if e.parts[2] == 'train':
-            if e.parts[3] == 'pos':
+        if e.parts[-3] == 'train':
+            if e.parts[-2] == 'pos':
                 text_train_pos.append(content)
-            elif e.parts[3] == 'neg':
+            elif e.parts[-2] == 'neg':
                 text_train_neg.append(content)
-        elif e.parts[2] == 'test':
-            if e.parts[3] == 'pos':
+        elif e.parts[-3] == 'test':
+            if e.parts[-2] == 'pos':
                 text_test_pos.append(content)
-            elif e.parts[3] == 'neg':
+            elif e.parts[-2] == 'neg':
                 text_test_neg.append(content)
     #print(text_train_pos)
     train_pos = pd.DataFrame({"texto": text_train_pos, "label": 1})
