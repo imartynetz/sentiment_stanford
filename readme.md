@@ -56,7 +56,7 @@ Caso não queira rodar os treinos, disponibilizo os modelos que treinei em
 
 https://drive.google.com/open?id=10DKR71tdEYLk9ZJW1BRa_d6IZrKMrNlV 
 
-Eles devem ser colocados dentro da pasta source_code
+Faça download dessa pasta dentro da pasta source.
 
 # Troubleshooting
 O treinamento do modelo de CNN poderá ocasionar problemas dependendo da sua máquina, uma vez que ele foi feito usando
