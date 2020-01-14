@@ -9,12 +9,16 @@ import seaborn as sns
 from matplotlib import style
 from tensorflow.keras import layers
 import tensorflow_datasets as tfds
+from pathlib import Path
 
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
 def train_model(train, test):
+    p = Path('models')
+    if not p.exists():
+        p.mkdir()
     # clean text
     data_clean = [common_modules.clean_text(text) for text in train.texto]
 
@@ -85,7 +89,9 @@ def train_model(train, test):
 
 
 def predict_model(texto):
-
+    p = Path('models')
+    if not p.exists():
+        p.mkdir()
     try:
         tokenizer = tfds.features.text.SubwordTextEncoder.load_from_file("models/vocab_cnn")
         VOCAB_SIZE = tokenizer.vocab_size

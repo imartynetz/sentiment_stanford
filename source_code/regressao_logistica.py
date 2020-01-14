@@ -7,9 +7,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 from joblib import dump, load
+from pathlib import Path
 
 
 def train_model(X_train, y_train, X_teste, y_teste):
+    p = Path('models')
+    if not p.exists():
+        p.mkdir()
     pipe = Pipeline([('tfidf', TfidfVectorizer(ngram_range=(1, 2))),
                      ('logreg', LogisticRegression(C=1000, solver='newton-cg',
                                                    random_state=42, n_jobs=-1))
@@ -29,6 +33,10 @@ def train_model(X_train, y_train, X_teste, y_teste):
 
 
 def predict_model(texto):
+    p = Path('models')
+    if not p.exists():
+        p.mkdir()
+
     try:
         model = load('models/log_reg.joblib')
     except:
