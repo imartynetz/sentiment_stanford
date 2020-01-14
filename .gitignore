@@ -131,3 +131,10 @@ dmypy.json
 # Pycharm
 .idea
 __pycache__
+
+# Models
+log_reg.joblib
+naive_bayes.joblib
+vocab_cnn.subwords
+dcnn_weights*
+checkpoint

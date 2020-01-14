@@ -14,13 +14,11 @@ physical_devices = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
-def main():
-    # import dataset
-    train, test = common_modules.merge_files()
+def train_model(train, test):
     # clean text
     data_clean = [common_modules.clean_text(text) for text in train.texto]
 
-    #change label -1 por 0, porque modelo obteve uma melhor performance dessa maneira
+    # change label -1 por 0, porque modelo obteve uma melhor performance dessa maneira
     data_labels = train.label.values
     data_labels[data_labels == -1] = 0
 
@@ -28,6 +26,8 @@ def main():
     tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
         data_clean, target_vocab_size=2 ** 16
     )
+    # salvando vocabulário
+    tokenizer.save_to_file("models/vocab_cnn")
 
     data_inputs = [tokenizer.encode(sentence) for sentence in data_clean]
 
@@ -54,15 +54,10 @@ def main():
     NB_CLASSES = len(set(train.label))
     DROPOUT_RATE = 0.4
     BATCH_SIZE = 10
-    NB_EPOCHS = 10
+    NB_EPOCHS = 5
 
     # instanciar objeto da arquitetura da rede
-    Dcnn = DCNN(vocab_size=VOCAB_SIZE,
-                emb_dim=EMB_DIM,
-                nb_filters=NB_FILTERS,
-                FFN_units=FFN_UNITS,
-                nb_classes=NB_CLASSES,
-                dropout_rate=DROPOUT_RATE)
+    Dcnn = get_model(VOCAB_SIZE, EMB_DIM, NB_FILTERS, FFN_UNITS, NB_CLASSES, DROPOUT_RATE)
 
     Dcnn.compile(loss="binary_crossentropy",
                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, amsgrad=False),
@@ -79,6 +74,7 @@ def main():
     train['precision'] = train['label'] - train['predict']
     acc_train = len(train[train.precision == 0]) / len(train)
     print(f"Accuracy for all train data: {acc_train}")
+    Dcnn.save_weights('models/dcnn_weights', save_format='tf')
 
     test['predict'] = test['texto'].apply(
         lambda x: round(Dcnn(np.array([tokenizer.encode(x)]), training=False).numpy()[0][0]))
@@ -88,28 +84,42 @@ def main():
     print(f"Accuracy for all test data: {acc_teste}")
 
 
-    """
-    Mostra o histórico de treino e validação do modelo. Se a val_acc subir no final 
-    das epochs é sinal que modelo está overfitando, ideal é que ambos val_acc quanto
-    acc fiquem proximas e valores baixos.
-    """
+def predict_model(texto):
 
-    style.use("seaborn-ticks")
-    Dcnn.evaluate(train_inputs,
-                  train_labels)
-    plt.figure(figsize=(12, 8))
-    x_axis = np.linspace(1, 10, 10)
-    plt.subplot(2, 1, 1)
-    plt.plot(x_axis, Dcnn_history.history['accuracy'], Dcnn_history.history['val_accuracy'])
-    plt.title('Training metrics')
-    plt.ylabel('Accuracy')
+    try:
+        tokenizer = tfds.features.text.SubwordTextEncoder.load_from_file("models/vocab_cnn")
+        VOCAB_SIZE = tokenizer.vocab_size
+        EMB_DIM = 200
+        NB_FILTERS = 100
+        FFN_UNITS = 256
+        NB_CLASSES = 2
+        DROPOUT_RATE = 0.4
+        BATCH_SIZE = 10
+        NB_EPOCHS = 5
+        model = get_model(VOCAB_SIZE, EMB_DIM, NB_FILTERS, FFN_UNITS, NB_CLASSES, DROPOUT_RATE)
+        model.compile(loss="binary_crossentropy",
+                     optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, amsgrad=False),
+                     metrics=["accuracy"])
+        model.load_weights('models/dcnn_weights')
 
-    plt.subplot(2, 1, 2)
-    plt.plot(x_axis, Dcnn_history.history['loss'], Dcnn_history.history['val_loss'])
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.savefig("DCNN_history.png")
+    except:
+        raise TypeError("Modelo CNN não foi treinado ainda.")
+
+    predict = round(model(np.array([tokenizer.encode(texto)]), training=False).numpy()[0][0])
+    if predict == 0:
+        predict = -1
+
+    print("\n")
+    print("=" * 60)
+    print(f"Polaridade Predita: {predict}")
+    print("=" * 60)
+    print("\n")
 
 
-if __name__ == "__main__":
-    main()
+def get_model(VOCAB_SIZE, EMB_DIM, NB_FILTERS, FFN_UNITS, NB_CLASSES, DROPOUT_RATE):
+    return DCNN(vocab_size=VOCAB_SIZE,
+                emb_dim=EMB_DIM,
+                nb_filters=NB_FILTERS,
+                FFN_units=FFN_UNITS,
+                nb_classes=NB_CLASSES,
+                dropout_rate=DROPOUT_RATE)

@@ -13,8 +13,6 @@ def main():
     pipeline = pdp.ApplyByCols("texto", common_modules.tag_remove, "clean_texto", drop=False)
     pipeline += pdp.ApplyByCols("clean_texto", common_modules.trat_texto)
     train = pipeline(train)
-    #test = pipeline(test)
-
 
     print("Fazendo gridSearch da Regressão logistica")
     score_log_reg, param_log_reg = reg_log(train.texto, train.label)

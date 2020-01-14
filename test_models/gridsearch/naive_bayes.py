@@ -20,5 +20,5 @@ def naive_bayes(X_train, y_train):
 
     nb = GridSearchCV(pipe, param_grid=parameter, cv=5, verbose=1)
     nb.fit(X_train, y_train)
-    print(f"Best o score : {nb.best_score} with {nb.best_params}")
-    return nb.best_score, nb.best_params
+    print(f"Best o score : {nb.best_score_} with {nb.best_params_}")
+    return nb.best_score_, nb.best_params_

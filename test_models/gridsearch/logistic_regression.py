@@ -19,5 +19,5 @@ def reg_log(X_train, y_train):
                  }
     model = GridSearchCV(pipe, param_grid=parameter, cv=5, verbose=1)
     model.fit(X_train, y_train)
-    print(f"Best o score : {model.best_score} with {model.best_params}")
-    return model.best_score, model.best_params
+    print(f"Best o score : {model.best_score_} with {model.best_params_}")
+    return model.best_score_, model.best_params_
