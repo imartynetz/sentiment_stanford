@@ -44,4 +44,7 @@ def predict_model(texto):
     texto = common_modules.trat_texto(texto)
     prediction = model.predict([" ".join(texto)])
     print("\n")
+    print("=" * 60)
     print(f"Polaridade Predita: {prediction[0]}")
+    print("=" * 60)
+    print("\n")
